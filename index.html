@@ -1,0 +1,65 @@
+<input type='text' name='input' id='input'>
+<button type='submit' id='enter' onclick='update()'>Enter</button>
+<p>Output: <span id="output"></span></p>
+<p>Prompt: <span id="prompt"></span></p>
+<p>Code: <span id="code"></span></p>
+
+<style>
+    body {
+        background-color: #111;
+        color: white;
+        accent-color: white;
+    }
+    #output, #prompt, #code {
+        background-color: transparent;
+        border-radius: 10px;
+        padding: 10px;
+        font-family: sans-serif;
+        white-space: pre-line;
+    }
+</style>
+<script>
+let open_ai_response;
+let api_key = 'API_KEY';
+var prompt_text = '';
+var raw_output = 'There is no server response';
+// var prompt_text = 'Write an abstract existentialist poem in the style of black metal lyrics'
+function update() {
+    prompt_text = document.getElementById('input').value;
+    console.log('Prompt: ' + prompt_text);
+    document.getElementById('prompt').innerHTML = prompt_text;
+    openai_test();
+}
+function openai_test() {
+    var data = `{"prompt": "${prompt_text}","temperature": 0.7,"max_tokens": 4000,"top_p": 1,"frequency_penalty": 0.75,"presence_penalty": 0,"stream": false}`;
+    var output = '';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.openai.com/v1/engines/text-davinci-003/completions');  
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + api_key);
+    xhr.send(data);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            console.log('Code : ' + xhr.status);
+            document.getElementById('code').innerHTML = xhr.status;
+            if (xhr.status == 400) {
+                console.log('400 Bad request, server will not process')
+            }else if (xhr.status == 200) {
+                json = JSON.parse(xhr.responseText);
+                raw_output = xhr.responseText;
+                output = json.choices[0].text
+                output = output.replace(' ', '&nbsp;').replace('\n', '<br>');
+                console.log(json.choices[0].text);
+                document.getElementById('output').innerHTML = output;
+            } else if (xhr.status == 401) {
+                console.log('Error 401, you probably need to check your api key');
+            } else if (xhr.status == 405) {
+                console.log('Error 405, did you switch the request type to GET? it needs to be POST')
+            } else {
+                console.log('Other error, try googling this error code: ' + xhr.status)
+                console.log('--- FULL RESPONSE ---\n'+ raw_output)
+            };
+        };
+    };
+};
+</script>
