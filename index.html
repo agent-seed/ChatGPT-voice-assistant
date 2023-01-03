@@ -1,6 +1,9 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <input type='text' name='input' id='input'>
 <button type='submit' id='enter' onclick='update()'>Enter</button>
-<p>Output: <span id="output"></span></p>
+<p>Output: <span id="output"></span><button id="speak"><span onclick="speak()" class="material-symbols-outlined">
+    volume_up
+    </span></button></p>
 <p>Prompt: <span id="prompt"></span></p>
 <p>Code: <span id="code"></span></p>
 
@@ -20,7 +23,7 @@
 </style>
 <script>
 let open_ai_response;
-let api_key = 'API_KEY';
+let api_key = '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';
 var prompt_text = '';
 var raw_output = 'There is no server response';
 // var prompt_text = 'Write an abstract existentialist poem in the style of black metal lyrics'
@@ -51,6 +54,10 @@ function openai_test() {
                 output = output.replace(' ', '&nbsp;').replace('\n', '<br>');
                 console.log(json.choices[0].text);
                 document.getElementById('output').innerHTML = output;
+                var msg = new SpeechSynthesisUtterance();
+                msg.text == output;
+                window.speechSynthesis.speak(msg);
+
             } else if (xhr.status == 401) {
                 console.log('Error 401, you probably need to check your api key');
             } else if (xhr.status == 405) {
@@ -62,4 +69,10 @@ function openai_test() {
         };
     };
 };
+function speak() {
+    var msg = new SpeechSynthesisUtterance();
+    msg.text == output;
+    window.speechSynthesis.speak(msg);
+}
+//  api key = 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
 </script>
